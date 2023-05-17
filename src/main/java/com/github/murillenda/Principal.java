@@ -1,21 +1,19 @@
 package com.github.murillenda;
 
 import com.github.murillenda.entity.Venda;
-import com.github.murillenda.repository.VendaRepository;
+import com.github.murillenda.repository.RepositoryFactory;
 import com.github.murillenda.service.CadastroVendaService;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class Principal {
     public static void main(String[] args) throws SQLException {
-        try (Connection conexao = DriverManager
-                .getConnection("jdbc:mysql://localhost:3306/comercial", "root", "admin")) {
 
-            var vendaRepository = new VendaRepository(conexao);
+        try (var fabricaRepository = new RepositoryFactory()) {
+
+            var vendaRepository = fabricaRepository.criarVendaRepository();
             var cadastroVendaServico = new CadastroVendaService(vendaRepository);
 
             Venda vendaCadastrada = cadastroVendaServico.cadastrar("José da Silva",
@@ -29,4 +27,5 @@ public class Principal {
             todasVendas.forEach(System.out::println);
         }
     }
+
 }
