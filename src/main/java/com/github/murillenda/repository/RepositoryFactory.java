@@ -1,34 +1,38 @@
 package com.github.murillenda.repository;
 
-import com.github.murillenda.repository.mysql.MySQLVendaRepository;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import com.github.murillenda.repository.memoria.MemoriaRepositoryFactory;
+import com.github.murillenda.repository.mysql.MySQLRepositoryFactory;
 
-public class RepositoryFactory implements AutoCloseable {
+import java.io.IOException;
+import java.util.Properties;
 
-    private final Connection conexao;
+public interface RepositoryFactory extends AutoCloseable {
 
-    public RepositoryFactory() {
-        try {
-            this.conexao = DriverManager
-                    .getConnection("jdbc:mysql://localhost:3306/comercial", "root", "admin");
-        } catch (SQLException e) {
-            throw new PersistenciaException(e);
+
+    static RepositoryFactory obterInstancia() {
+        // Classe que representa as propriedades
+        var properties = new Properties();
+        try (var is = RepositoryFactory.class
+                .getResourceAsStream("/persistencia.properties")) {
+
+            // Lê tudo dentro do inputStream e carrega para o properties
+            properties.load(is);
+        } catch (IOException e) {
+            throw new PersistenciaException("Erro carregando configurarações", e);
         }
+
+        if ("mysql".equals(properties.getProperty("repositorio"))) {
+            return new MySQLRepositoryFactory(properties);
+        } else if ("memoria".equals(properties.getProperty("repositorio"))) {
+            return new MemoriaRepositoryFactory();
+        }
+
+        throw new PersistenciaException("Implementação de repositório não existe");
     }
 
-    public VendaRepository criarVendaRepository() {
-        return new MySQLVendaRepository(conexao);
-    }
+    VendaRepository criarVendaRepository();
 
     @Override
-    public void close() {
-        try {
-            conexao.close();
-        } catch (SQLException e) {
-            throw new PersistenciaException(e);
-        }
-    }
+    void close();
 }

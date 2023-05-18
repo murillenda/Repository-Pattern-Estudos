@@ -5,13 +5,12 @@ import com.github.murillenda.repository.RepositoryFactory;
 import com.github.murillenda.service.CadastroVendaService;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class Principal {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
-        try (var fabricaRepository = new RepositoryFactory()) {
+        try (var fabricaRepository = RepositoryFactory.obterInstancia()) {
 
             var vendaRepository = fabricaRepository.criarVendaRepository();
             var cadastroVendaServico = new CadastroVendaService(vendaRepository);
