@@ -1,5 +1,7 @@
 package com.github.murillenda.repository;
 
+import com.github.murillenda.repository.mysql.MySQLVendaRepository;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ public class RepositoryFactory implements AutoCloseable {
     }
 
     public VendaRepository criarVendaRepository() {
-        return new VendaRepository(conexao);
+        return new MySQLVendaRepository(conexao);
     }
 
     @Override
